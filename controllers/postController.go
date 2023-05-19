@@ -14,39 +14,37 @@ type PostController struct {
 }
 
 func (postController *PostController) Login(w http.ResponseWriter, r *http.Request) {
-
 	_, err := security.VerifyToken(r)
-
 	if err != nil {
-		log.Println("Error verficando el csrf token ")
+		log.Println("Error verifying csrf token")
+		return
 	}
 
 	username := r.FormValue("username")
 	password := r.FormValue("password")
-	rememberme := r.FormValue("remember") == "on"
+	remember := r.FormValue("remember") == "on"
 
 	if username == "" || password == "" {
-		log.Println("El usuario o la contraseña estan  vacios")
-		http.Redirect(w, r, "/login", http.StatusNotFound)
+		log.Println("Tried to login user with empty username or password")
+		http.Redirect(w, r, "/login", http.StatusFound)
 	}
 
-	_, err = models.AuthenticateUser(postController.App, w, username, password, rememberme)
-
+	_, err = models.AuthenticateUser(postController.App, w, username, password, remember)
 	if err != nil {
-		log.Println("usuario no valido")
+		log.Println("Error authenticating user")
 		log.Println(err)
-		http.Redirect(w, r, "/login", http.StatusNotFound)
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
 	}
 
-	http.Redirect(w, r, "/", http.StatusNotFound)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func (postController *PostController) Register(w http.ResponseWriter, r *http.Request) {
-
 	_, err := security.VerifyToken(r)
-
 	if err != nil {
-		log.Println("Error verficando el csrf token ")
+		log.Println("Error verifying csrf token")
+		return
 	}
 
 	username := r.FormValue("username")
@@ -55,16 +53,16 @@ func (postController *PostController) Register(w http.ResponseWriter, r *http.Re
 	updatedAt := time.Now()
 
 	if username == "" || password == "" {
-		log.Println("El usuario o la contraseña estan  vacios")
-		http.Redirect(w, r, "/register", http.StatusNotFound)
+		log.Println("Tried to create user with empty username or password")
+		http.Redirect(w, r, "/register", http.StatusFound)
 	}
 
 	_, err = models.CreateUser(postController.App, username, password, createdAt, updatedAt)
-
 	if err != nil {
-		log.Println("Error al crear usuario ")
+		log.Println("Error creating user")
 		log.Println(err)
+		return
 	}
 
-	http.Redirect(w, r, "/login", http.StatusNotFound)
+	http.Redirect(w, r, "/login", http.StatusFound)
 }

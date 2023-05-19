@@ -65,10 +65,8 @@ func RunScheduledTasks(app *App, poolSize int, stop <-chan struct{}) {
 		}(task, runner)
 	}
 
-	// Wait for all goroutines to finish
 	wg.Wait()
 
-	// Close channels
 	for _, runner := range runners {
 		close(runner)
 	}

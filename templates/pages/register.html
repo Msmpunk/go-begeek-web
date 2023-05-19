@@ -4,7 +4,7 @@
 <h1>Register</h1>
 <div class="container">
     <form action="/register-handle" method="post">
-        <input name="csrf_token" type="hidden" value="{{ .CsrfToken }}">
+        <input name="token_beegek" type="hidden" value="{{ .CsrfToken }}">
 
         <label for="username">Usuario:</label><br>
         <input id="username" name="username" type="text" placeholder="John"><br><br>

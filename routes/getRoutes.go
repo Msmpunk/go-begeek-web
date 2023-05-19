@@ -9,27 +9,21 @@ import (
 )
 
 func GetRoutes(app *app.App) {
-
-	getCotroller := controllers.GetCotroller{
+	getController := controllers.GetController{
 		App: app,
 	}
 
 	staticFS, err := fs.Sub(app.Res, "static")
-
 	if err != nil {
 		log.Println(err)
 		return
 	}
-
 	staticHandler := http.FileServer(http.FS(staticFS))
+	http.Handle("/static/", http.StripPrefix("/static/", staticHandler))
+	log.Println("Serving static files from embedded file system /static")
 
-	http.Handle("/static", http.StripPrefix("/static", staticHandler))
-
-	log.Println("Archivos cargados correctamente")
-
-	//pages
-	http.HandleFunc("/", getCotroller.ShowHome)
-	http.HandleFunc("/login", getCotroller.ShowLogin)
-	http.HandleFunc("/register", getCotroller.ShowRegister)
-	http.HandleFunc("/logout", getCotroller.Logout)
+	http.HandleFunc("/", getController.ShowHome)
+	http.HandleFunc("/login", getController.ShowLogin)
+	http.HandleFunc("/register", getController.ShowRegister)
+	http.HandleFunc("/logout", getController.Logout)
 }

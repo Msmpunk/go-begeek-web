@@ -27,7 +27,6 @@ type Configuration struct {
 	}
 }
 
-// LoadConfig loads and returns a configuration struct
 func LoadConfig() Configuration {
 	c := flag.String("c", "env.json", "Path to the json configuration file")
 	flag.Parse()
@@ -43,7 +42,6 @@ func LoadConfig() Configuration {
 		}
 	}(file)
 
-	// Decode json config file to Configuration struct named config
 	decoder := json.NewDecoder(file)
 	Config := Configuration{}
 	err = decoder.Decode(&Config)

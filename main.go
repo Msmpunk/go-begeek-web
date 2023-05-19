@@ -7,6 +7,7 @@ import (
 	"GoWeb/models"
 	"GoWeb/routes"
 	"context"
+	"embed"
 	"log"
 	"net/http"
 	"os"
@@ -15,19 +16,22 @@ import (
 	"time"
 )
 
+//go:embed templates static
+var res embed.FS
+
 func main() {
 	appLoad := app.App{}
 
 	appLoad.Config = config.LoadConfig()
 
-	// Cargar templates
+	appLoad.Res = &res
 
 	if _, err := os.Stat("logs"); os.IsNotExist(err) {
 		err := os.Mkdir("logs", 0755)
 		if err != nil {
 			log.Println("Error al crear el archivo")
 			log.Panicln(err)
-
+			return
 		}
 	}
 
@@ -56,9 +60,7 @@ func main() {
 	routes.GetRoutes(&appLoad)
 	routes.PostRoutes(&appLoad)
 
-	server := &http.Server{
-		Addr: appLoad.Config.Listen.Ip + ":" + appLoad.Config.Listen.Port,
-	}
+	server := &http.Server{Addr: appLoad.Config.Listen.Ip + ":" + appLoad.Config.Listen.Port}
 
 	go func() {
 		log.Println("Servidor iniciando")

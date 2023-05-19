@@ -95,15 +95,16 @@ func CreateUser(app *app.App, username string, password string, createdAt time.T
 func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, password string, remember bool) (Session, error) {
 	var user User
 
+	// Query row by username
 	err := app.Db.QueryRow(selectUserByUsername, username).Scan(&user.Id, &user.UserMame, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		log.Println("Error de autenticacion, usaurio no encontrado:" + username)
 		return Session{}, err
 	}
 
+	// Validate password
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-
-	if err != nil {
+	if err != nil { // Failed to validate password, doesn't match
 		log.Println("Error de autenticacion,(contraseña no encontrada) para:" + username)
 		return Session{}, err
 	} else {

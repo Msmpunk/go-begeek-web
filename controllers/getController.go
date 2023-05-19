@@ -5,63 +5,62 @@ import (
 	"GoWeb/models"
 	"GoWeb/security"
 	"GoWeb/templating"
-	"log"
+	"fmt"
 	"net/http"
 )
 
-type GetCotroller struct {
+type GetController struct {
 	App *app.App
 }
 
-func (getCotroller *GetCotroller) ShowHome(w http.ResponseWriter, _ *http.Request) {
+func (getController *GetController) ShowHome(w http.ResponseWriter, _ *http.Request) {
 	type dataStruct struct {
 		Test string
 	}
+
 	data := dataStruct{
-		Test: "Hola mundo",
+		Test: "Hola Mundo",
 	}
 
-	templating.RenderTemplate(getCotroller.App, w, "templates/pages/home.html", data)
+	templating.RenderTemplate(getController.App, w, "templates/pages/home.html", data)
 }
 
-func (getCotroller *GetCotroller) ShowRegister(w http.ResponseWriter, r *http.Request) {
+func (getController *GetController) ShowRegister(w http.ResponseWriter, r *http.Request) {
 	type dataStruct struct {
-		tokencsrf string
+		CsrfToken string
 	}
-	tokencsrf, err := security.GenerateToken(w, r)
 
+	CsrfToken, err := security.GenerateToken(w, r)
 	if err != nil {
-		log.Println("Error generarndo el token")
 		return
 	}
 
 	data := dataStruct{
-		tokencsrf: tokencsrf,
+		CsrfToken: CsrfToken,
 	}
 
-	templating.RenderTemplate(getCotroller.App, w, "templates/pages/register.html", data)
+	templating.RenderTemplate(getController.App, w, "templates/pages/register.html", data)
 }
 
-func (getCotroller *GetCotroller) ShowLogin(w http.ResponseWriter, r *http.Request) {
+func (getController *GetController) ShowLogin(w http.ResponseWriter, r *http.Request) {
 	type dataStruct struct {
-		tokencsrf string
+		CsrfToken string
 	}
-	tokencsrf, err := security.GenerateToken(w, r)
 
+	CsrfToken, err := security.GenerateToken(w, r)
+	fmt.Println(CsrfToken)
 	if err != nil {
-		log.Println("Error generarndo el token")
 		return
 	}
 
 	data := dataStruct{
-		tokencsrf: tokencsrf,
+		CsrfToken: CsrfToken,
 	}
 
-	templating.RenderTemplate(getCotroller.App, w, "templates/pages/login.html", data)
+	templating.RenderTemplate(getController.App, w, "templates/pages/login.html", data)
 }
 
-func (getCotroller *GetCotroller) Logout(w http.ResponseWriter, r *http.Request) {
-
-	models.LogoutUser(getCotroller.App, w, r)
-	http.Redirect(w, r, "/", http.StatusNotFound)
+func (getController *GetController) Logout(w http.ResponseWriter, r *http.Request) {
+	models.LogoutUser(getController.App, w, r)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
