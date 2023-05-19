@@ -37,7 +37,6 @@ func CreateSession(app *app.App, w http.ResponseWriter, userId int64, remember b
 	session.RememberMe = remember
 	session.CreatedAt = time.Now()
 
-	// If the AuthToken column for any user matches the token, set existingAuthToken to true
 	var existingAuthToken bool
 	err := app.Db.QueryRow(selectAuthTokenIfExists, session.AuthToken).Scan(&existingAuthToken)
 	if err != nil {
@@ -46,13 +45,11 @@ func CreateSession(app *app.App, w http.ResponseWriter, userId int64, remember b
 		return Session{}, err
 	}
 
-	// If duplicate token found, recursively call function until unique token is generated
 	if existingAuthToken == true {
 		log.Println("Hay un token duplicado en la tabla sessiones, generando un nuevo token")
 		return CreateSession(app, w, userId, remember)
 	}
 
-	// Insert session into database
 	err = app.Db.QueryRow(insertSession, session.UserId, session.AuthToken, session.RememberMe, session.CreatedAt).Scan(&session.Id)
 	if err != nil {
 		log.Println("Error al insertar en la base de datos")
@@ -127,8 +124,6 @@ func deleteSessionCookie(app *app.App, w http.ResponseWriter) {
 }
 
 func DeleteSessionByAuthToken(app *app.App, w http.ResponseWriter, authToken string) error {
-	//Remover de la base de datos
-
 	_, err := app.Db.Exec(deleteSessionByAuthToken, authToken)
 
 	if err != nil {
